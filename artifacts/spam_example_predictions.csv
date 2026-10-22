@@ -1,5 +1,5 @@
 text,spam_probability,threshold,predicted_label
-Get some free money,0.30340610636043397,0.40999999999999986,ham
-CONGRATULATIONS! You won a free prize! Click here now to claim your reward!,0.9710648556291198,0.40999999999999986,spam
-"Hey, are we still meeting at 6 pm?",0.016901571614981275,0.40999999999999986,ham
-Thank you for helping our community organize the event.,0.17541029578413986,0.40999999999999986,ham
+Get some free money,0.9354081506190115,0.45999999999999985,spam
+CONGRATULATIONS! You won a free prize! Click here now to claim your reward!,0.9944912859768307,0.45999999999999985,spam
+"Hey, are we still meeting at 6 pm?",0.014177948326397408,0.45999999999999985,ham
+Thank you for helping our community organize the event.,0.09798257134590428,0.45999999999999985,ham

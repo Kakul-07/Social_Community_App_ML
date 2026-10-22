@@ -1,11 +1,11 @@
 {
-  "spam_threshold": 0.40999999999999986,
+  "spam_threshold": 0.45999999999999985,
   "selected_model": "logistic_regression",
   "tuning_metric": "validation F2",
   "validation_comparison": [
     {
       "model": "logistic_regression",
-      "threshold": 0.40999999999999986,
+      "threshold": 0.45999999999999985,
       "f2": 0.9717868338557993,
       "f1": 0.9763779527559056,
       "precision": 0.9841269841269841,
@@ -13,7 +13,7 @@
     },
     {
       "model": "complement_naive_bayes",
-      "threshold": 0.6099999999999998,
+      "threshold": 0.5799999999999997,
       "f2": 0.9463722397476341,
       "f1": 0.96,
       "precision": 0.9836065573770492,

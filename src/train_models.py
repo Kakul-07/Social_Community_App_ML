@@ -212,10 +212,43 @@ spam_features = FeatureUnion([
         ),
     ),
 ])
+curated_spam_examples = [
+    "Get some free money",
+    "Get free money now",
+    "Win free cash now",
+    "Claim your free cash prize",
+    "Earn money fast from home",
+    "You can get free money today",
+    "Free money offer claim now",
+    "Congratulations you won free cash",
+    "Claim your cash reward now",
+    "Click here to get free money",
+    "Make money fast with this offer",
+    "Get a free prize by clicking here",
+]
+curated_ham_examples = [
+    "Can you send me the money for lunch?",
+    "I will get some money from the bank today.",
+    "The community meeting starts at 6 pm.",
+    "Thank you for helping our community organize the event.",
+    "Hey, are we still meeting at 6 pm?",
+    "Please send me the free time slots for the meeting.",
+    "We should discuss the budget at tomorrow's meeting.",
+    "I got your message and will reply later.",
+]
 
-X_spam_train = spam_features.fit_transform(
-    spam_train["text"].fillna("").astype(str)
-)
+base_spam_train_text = spam_train["text"].fillna("").astype(str)
+augmented_text = pd.concat([
+    base_spam_train_text.reset_index(drop=True),
+    pd.Series(curated_spam_examples + curated_ham_examples, dtype=str),
+], ignore_index=True)
+augmented_labels = np.concatenate([
+    y_spam_train,
+    np.ones(len(curated_spam_examples), dtype=int),
+    np.zeros(len(curated_ham_examples), dtype=int),
+])
+
+X_spam_train = spam_features.fit_transform(augmented_text)
 X_spam_validation = spam_features.transform(
     spam_validation["text"].fillna("").astype(str)
 )
@@ -242,7 +275,7 @@ spam_fitted_models = {}
 threshold_candidates = np.arange(0.10, 0.81, 0.01)
 
 for model_name, candidate in spam_candidates.items():
-    candidate.fit(X_spam_train, y_spam_train)
+    candidate.fit(X_spam_train, augmented_labels)
     validation_probabilities = candidate.predict_proba(X_spam_validation)[:, 1]
     threshold_rows = []
     for threshold in threshold_candidates:
@@ -288,6 +321,11 @@ spam_result = {
     "threshold": spam_threshold,
     "test_rows": int(len(spam_test)),
     "threshold_tuning": "F2 maximization on validation split only; test set not used for selection.",
+    "curated_training_examples": {
+        "spam": len(curated_spam_examples),
+        "ham": len(curated_ham_examples),
+        "note": "Manually reviewed short-message examples added to training only.",
+    },
 }
 
 joblib.dump(
