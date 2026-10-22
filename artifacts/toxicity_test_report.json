@@ -1,0 +1,139 @@
+{
+  "macro_f1": 0.6327119761435291,
+  "micro_f1": 0.7664172901080631,
+  "classification_report": {
+    "toxic": {
+      "precision": 0.8093083387201034,
+      "recall": 0.8183006535947712,
+      "f1-score": 0.8137796555086123,
+      "support": 1530.0
+    },
+    "severe_toxic": {
+      "precision": 0.4206008583690987,
+      "recall": 0.6242038216560509,
+      "f1-score": 0.5025641025641026,
+      "support": 157.0
+    },
+    "obscene": {
+      "precision": 0.8412322274881516,
+      "recall": 0.8170310701956272,
+      "f1-score": 0.8289550496205488,
+      "support": 869.0
+    },
+    "threat": {
+      "precision": 0.5517241379310345,
+      "recall": 0.3137254901960784,
+      "f1-score": 0.4,
+      "support": 51.0
+    },
+    "insult": {
+      "precision": 0.7337349397590361,
+      "recall": 0.7527812113720643,
+      "f1-score": 0.7431360585723001,
+      "support": 809.0
+    },
+    "identity_hate": {
+      "precision": 0.46551724137931033,
+      "recall": 0.5586206896551724,
+      "f1-score": 0.5078369905956113,
+      "support": 145.0
+    },
+    "micro avg": {
+      "precision": 0.756357670221493,
+      "recall": 0.776748104465038,
+      "f1-score": 0.7664172901080631,
+      "support": 3561.0
+    },
+    "macro avg": {
+      "precision": 0.6370196239411224,
+      "recall": 0.647443822778294,
+      "f1-score": 0.6327119761435291,
+      "support": 3561.0
+    },
+    "weighted avg": {
+      "precision": 0.7651042954205148,
+      "recall": 0.776748104465038,
+      "f1-score": 0.7693290677260186,
+      "support": 3561.0
+    },
+    "samples avg": {
+      "precision": 0.06903747336758992,
+      "recall": 0.07190332957346368,
+      "f1-score": 0.06771596689506201,
+      "support": 3561.0
+    }
+  },
+  "confusion_matrices": {
+    "toxic": [
+      [
+        14133,
+        295
+      ],
+      [
+        278,
+        1252
+      ]
+    ],
+    "severe_toxic": [
+      [
+        15666,
+        135
+      ],
+      [
+        59,
+        98
+      ]
+    ],
+    "obscene": [
+      [
+        14955,
+        134
+      ],
+      [
+        159,
+        710
+      ]
+    ],
+    "threat": [
+      [
+        15894,
+        13
+      ],
+      [
+        35,
+        16
+      ]
+    ],
+    "insult": [
+      [
+        14928,
+        221
+      ],
+      [
+        200,
+        609
+      ]
+    ],
+    "identity_hate": [
+      [
+        15720,
+        93
+      ],
+      [
+        64,
+        81
+      ]
+    ]
+  },
+  "thresholds": {
+    "toxic": 0.26,
+    "severe_toxic": 0.14,
+    "obscene": 0.24000000000000005,
+    "threat": 0.18000000000000002,
+    "insult": 0.24000000000000005,
+    "identity_hate": 0.12000000000000001
+  },
+  "test_rows": 15958,
+  "threshold_tuning": "Per-label F1 maximization on validation split only.",
+  "test_source": "Stratified holdout from labeled train.csv, not official test.csv."
+}

@@ -1,0 +1,44 @@
+{
+  "accuracy": 0.9844961240310077,
+  "spam_f1": 0.9375,
+  "classification_report": {
+    "ham": {
+      "precision": 0.9911504424778761,
+      "recall": 0.9911504424778761,
+      "f1-score": 0.9911504424778761,
+      "support": 452.0
+    },
+    "spam": {
+      "precision": 0.9375,
+      "recall": 0.9375,
+      "f1-score": 0.9375,
+      "support": 64.0
+    },
+    "accuracy": 0.9844961240310077,
+    "macro avg": {
+      "precision": 0.964325221238938,
+      "recall": 0.964325221238938,
+      "f1-score": 0.964325221238938,
+      "support": 516.0
+    },
+    "weighted avg": {
+      "precision": 0.9844961240310077,
+      "recall": 0.9844961240310077,
+      "f1-score": 0.9844961240310077,
+      "support": 516.0
+    }
+  },
+  "confusion_matrix": [
+    [
+      448,
+      4
+    ],
+    [
+      4,
+      60
+    ]
+  ],
+  "threshold": 0.4799999999999998,
+  "test_rows": 516,
+  "threshold_tuning": "Spam F1 maximization on validation split only."
+}

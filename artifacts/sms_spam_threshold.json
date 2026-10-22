@@ -1,0 +1,4 @@
+{
+  "spam_threshold": 0.4799999999999998,
+  "tuning_metric": "validation spam F1"
+}
