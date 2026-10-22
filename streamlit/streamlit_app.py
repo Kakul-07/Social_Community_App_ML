@@ -5,16 +5,13 @@ import streamlit as st
 
 st.set_page_config(
     page_title="Smart Community AI Moderation",
-    page_icon="🛡️",
     layout="centered",
 )
-st.title("🛡️ Smart Community — Comment Moderation")
+st.title(" Smart Community — Comment Moderation")
 st.caption(
     "This tool supports moderator review. Predictions should not be the sole basis for punishment."
 )
 
-# Add ML_API_URL in Streamlit Community Cloud → App settings → Secrets.
-# Enter only the base Render URL; this app appends /predict.
 try:
     API_BASE_URL = str(st.secrets.get("ML_API_URL", "")).strip().rstrip("/")
 except Exception:

@@ -4,11 +4,6 @@ from typing import Any
 import joblib
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, ConfigDict, Field
-
-# Project layout:
-# project-root/
-#   app/main.py
-#   artifacts/<trained model files>
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 ARTIFACTS_DIR = PROJECT_ROOT / "artifacts"
 
@@ -42,8 +37,6 @@ def load_artifact(path: Path) -> Any | None:
         print(f"Could not load model artifact {path.name}: {exc}")
         return None
 
-
-# Load models once at startup. Raw training CSVs are not needed for inference.
 toxicity_bundle = load_artifact(TOXICITY_MODEL_PATH)
 spam_bundle = load_artifact(SPAM_MODEL_PATH)
 
@@ -123,7 +116,6 @@ def predict(request: PredictionRequest):
         )
 
     try:
-        # Toxicity bundle is expected to contain features, model, labels, thresholds.
         tox_x = toxicity_bundle["features"].transform([text])
         tox_probs = toxicity_bundle["model"].predict_proba(tox_x)[0]
         tox_labels = list(toxicity_bundle["labels"])
@@ -138,7 +130,6 @@ def predict(request: PredictionRequest):
             if probability >= float(tox_thresholds.get(label, 0.5))
         ]
 
-        # Spam bundle is expected to contain features, model, threshold.
         spam_x = spam_bundle["features"].transform([text])
         spam_model = spam_bundle["model"]
         spam_probs = spam_model.predict_proba(spam_x)[0]
@@ -188,7 +179,6 @@ def predict(request: PredictionRequest):
     except HTTPException:
         raise
     except Exception as exc:
-        # Keep internal paths/stack traces out of the public API response.
         print(f"Prediction error: {type(exc).__name__}: {exc}")
         raise HTTPException(
             status_code=500,
