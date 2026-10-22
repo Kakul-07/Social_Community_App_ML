@@ -1,282 +1,71 @@
 import os
+
 import requests
 import streamlit as st
 
+st.set_page_config(page_title="Smart Community AI Moderation", page_icon="🛡️", layout="centered")
+st.title("🛡️ Smart Community — Comment Moderation")
+st.caption("This tool supports moderator review; predictions should not be the sole basis for punishment.")
 
-DEFAULT_API_URL = (
-    "https://group-03-social-community-app-xuoc.onrender.com"
-)
+# Configure ML_API_URL in Streamlit Community Cloud → App settings → Secrets.
+# The API URL is intentionally never displayed in the page.
+try:
+    API_BASE_URL = str(st.secrets.get("ML_API_URL", "")).strip().rstrip("/")
+except Exception:
+    API_BASE_URL = ""
+API_BASE_URL = API_BASE_URL or os.getenv("ML_API_URL", "").strip().rstrip("/")
 
-PREDICTION_ENDPOINT = "/api/v1/moderation/predict"
-HEALTH_ENDPOINT = "/health"
+text_value = st.text_area("Enter a community comment", height=150, max_chars=20000, placeholder="Type a comment to check for toxicity or spam...")
 
-
-
-st.set_page_config(
-    page_title="Smart Community ML",
-    layout="centered",
-)
-
-st.title(" Smart Community")
-st.header("AI Comment Moderation")
-
-st.write(
-    "Analyze community comments for potentially harmful "
-    "language and spam using machine learning."
-)
-
-
-
-with st.sidebar:
-    st.subheader("API Configuration")
-
-    api_url = st.text_input(
-        "ML API Base URL",
-        value=os.getenv(
-            "ML_API_BASE_URL",
-            DEFAULT_API_URL,
-        ),
-    ).strip().rstrip("/")
-
-    st.caption(
-        "Predictions are processed by the FastAPI service "
-        "deployed on Render."
-    )
-
-    if st.button("Check API Health"):
-        try:
-            response = requests.get(
-                f"{api_url}{HEALTH_ENDPOINT}",
-                timeout=30,
-            )
-
-            st.write(
-                f"HTTP status: {response.status_code}"
-            )
-
-            try:
-                st.json(response.json())
-            except ValueError:
-                st.code(response.text)
-
-        except requests.RequestException as exc:
-            st.error(f"API connection failed: {exc}")
-
-comment = st.text_area(
-    "Enter a community comment",
-    placeholder=(
-        "Example: Thank you for helping with "
-        "the community event."
-    ),
-    height=150,
-    max_chars=10000,
-)
-
-if st.button(
-    "Analyze Comment",
-    type="primary",
-    use_container_width=True,
-):
-
-    if not api_url:
-        st.error("Please enter the API base URL.")
-
-    elif not comment.strip():
-        st.warning("Please enter a comment.")
-
+if st.button("Analyze comment", type="primary", use_container_width=True):
+    if not text_value.strip():
+        st.warning("Please enter a comment first.")
+    elif not API_BASE_URL:
+        st.error("The moderation API is not configured. Add ML_API_URL in the app's Secrets settings and restart the app.")
     else:
-
-        payload = {
-            "text": comment.strip()
-        }
-
-        prediction_url = (
-            f"{api_url}{PREDICTION_ENDPOINT}"
-        )
-
         try:
-            with st.spinner(
-                "Analyzing comment..."
-            ):
+            with st.spinner("Analyzing comment..."):
                 response = requests.post(
-                    prediction_url,
-                    json=payload,
-                    timeout=60,
+                    f"{API_BASE_URL}/predict",
+                    json={"text": text_value.strip()},
+                    timeout=(10, 120),
                 )
-
             if not response.ok:
-
-                st.error(
-                    f"API returned HTTP "
-                    f"{response.status_code}"
-                )
-
                 try:
-                    st.json(response.json())
+                    detail = response.json().get("detail", "The API request failed.")
                 except ValueError:
-                    st.code(response.text)
-
+                    detail = "The API request failed. Please try again later."
+                st.error(f"Prediction failed (HTTP {response.status_code}): {detail}")
             else:
-
                 result = response.json()
-
-                # Overall moderation status
-                status = result.get(
-                    "status",
-                    "UNKNOWN",
-                )
-
-                if status == "REVIEW":
-                    st.error(
-                        "Comment flagged for review"
-                    )
-
-                elif status == "PASSED":
-                    st.success(
-                        " No configured toxicity "
-                        "or spam threshold was triggered"
-                    )
-
+                if result.get("status") == "REVIEW":
+                    st.warning("Flagged for human moderator review.")
                 else:
-                    st.info(
-                        f"Moderation status: {status}"
-                    )
+                    st.success("No configured toxicity or spam threshold was crossed.")
 
-                # Result sections
-                toxicity = result.get(
-                    "toxicity",
-                    {},
-                )
+                st.subheader("Moderation result")
+                st.metric("Decision", result.get("status", "UNKNOWN"))
 
-                spam = result.get(
-                    "spam",
-                    {},
-                )
+                toxicity = result.get("toxicity", {})
+                spam = result.get("spam", {})
+                left, right = st.columns(2)
+                with left:
+                    st.markdown("**Toxicity**")
+                    st.write("Detected:", "Yes" if toxicity.get("detected") else "No")
+                    labels = toxicity.get("detected_labels", [])
+                    st.write("Detected labels:", ", ".join(labels) if labels else "None")
+                    if toxicity.get("probabilities"):
+                        with st.expander("Toxicity probabilities"):
+                            st.json(toxicity["probabilities"])
+                with right:
+                    st.markdown("**Spam**")
+                    st.write("Detected:", "Yes" if spam.get("detected") else "No")
+                    st.write("Spam probability:", spam.get("probability", "N/A"))
+                    st.write("Threshold:", spam.get("threshold", "N/A"))
 
-                col1, col2 = st.columns(2)
-
-                with col1:
-                    st.metric(
-                        "Toxicity detected",
-                        (
-                            "Yes"
-                            if toxicity.get("detected")
-                            else "No"
-                        ),
-                    )
-
-                with col2:
-                    st.metric(
-                        "Spam detected",
-                        (
-                            "Yes"
-                            if spam.get("detected")
-                            else "No"
-                        ),
-                    )
-
-                # Toxicity labels
-                st.subheader("Toxicity Analysis")
-
-                detected_labels = toxicity.get(
-                    "detected_labels",
-                    [],
-                )
-
-                if detected_labels:
-                    st.write(
-                        "Detected labels: "
-                        + ", ".join(detected_labels)
-                    )
-                else:
-                    st.write(
-                        "No toxicity labels crossed "
-                        "their configured thresholds."
-                    )
-
-                probabilities = toxicity.get(
-                    "probabilities",
-                    {},
-                )
-
-                if probabilities:
-
-                    st.write(
-                        "Toxicity label probabilities"
-                    )
-
-                    for label, probability in (
-                        probabilities.items()
-                    ):
-
-                        probability = float(
-                            probability
-                        )
-
-                        st.progress(
-                            max(
-                                0.0,
-                                min(1.0, probability),
-                            ),
-                            text=(
-                                f"{label}: "
-                                f"{probability:.1%}"
-                            ),
-                        )
-
-                # Spam probability
-                st.subheader("Spam Analysis")
-
-                spam_probability = spam.get(
-                    "probability"
-                )
-
-                if spam_probability is not None:
-
-                    spam_probability = float(
-                        spam_probability
-                    )
-
-                    st.progress(
-                        max(
-                            0.0,
-                            min(1.0, spam_probability),
-                        ),
-                        text=(
-                            "Spam probability: "
-                            f"{spam_probability:.1%}"
-                        ),
-                    )
-
-                reasons = result.get(
-                    "reason",
-                    [],
-                )
-
-                if reasons:
-
-                    st.subheader(
-                        "Moderation Reasons"
-                    )
-
-                    for reason in reasons:
-                        st.write(f"- {reason}")
-                        
-                with st.expander(
-                    "View complete API response"
-                ):
-                    st.json(result)
-
-        except requests.RequestException as exc:
-
-            st.error(
-                f"Could not connect to the ML API: {exc}"
-            )
-
-        except (ValueError, TypeError) as exc:
-
-            st.error(
-                f"Could not process the API response: {exc}"
-            )
-
-st.divider()
+                if result.get("reason"):
+                    st.caption("Reason: " + ", ".join(result["reason"]))
+        except requests.Timeout:
+            st.error("The moderation API took too long to respond. Please try again.")
+        except requests.RequestException:
+            st.error("Could not connect to the moderation API. Check the deployment status and try again.")
