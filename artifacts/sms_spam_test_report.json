@@ -1,44 +1,66 @@
 {
-  "accuracy": 0.9844961240310077,
-  "spam_f1": 0.9375,
+  "selected_model": "logistic_regression",
+  "validation_comparison": [
+    {
+      "model": "logistic_regression",
+      "threshold": 0.40999999999999986,
+      "f2": 0.9717868338557993,
+      "f1": 0.9763779527559056,
+      "precision": 0.9841269841269841,
+      "recall": 0.96875
+    },
+    {
+      "model": "complement_naive_bayes",
+      "threshold": 0.6099999999999998,
+      "f2": 0.9463722397476341,
+      "f1": 0.96,
+      "precision": 0.9836065573770492,
+      "recall": 0.9375
+    }
+  ],
+  "accuracy": 0.9883720930232558,
+  "spam_precision": 0.953125,
+  "spam_recall": 0.953125,
+  "spam_f1": 0.953125,
+  "spam_f2": 0.953125,
   "classification_report": {
     "ham": {
-      "precision": 0.9911504424778761,
-      "recall": 0.9911504424778761,
-      "f1-score": 0.9911504424778761,
+      "precision": 0.9933628318584071,
+      "recall": 0.9933628318584071,
+      "f1-score": 0.9933628318584071,
       "support": 452.0
     },
     "spam": {
-      "precision": 0.9375,
-      "recall": 0.9375,
-      "f1-score": 0.9375,
+      "precision": 0.953125,
+      "recall": 0.953125,
+      "f1-score": 0.953125,
       "support": 64.0
     },
-    "accuracy": 0.9844961240310077,
+    "accuracy": 0.9883720930232558,
     "macro avg": {
-      "precision": 0.964325221238938,
-      "recall": 0.964325221238938,
-      "f1-score": 0.964325221238938,
+      "precision": 0.9732439159292036,
+      "recall": 0.9732439159292036,
+      "f1-score": 0.9732439159292036,
       "support": 516.0
     },
     "weighted avg": {
-      "precision": 0.9844961240310077,
-      "recall": 0.9844961240310077,
-      "f1-score": 0.9844961240310077,
+      "precision": 0.9883720930232558,
+      "recall": 0.9883720930232558,
+      "f1-score": 0.9883720930232558,
       "support": 516.0
     }
   },
   "confusion_matrix": [
     [
-      448,
-      4
+      449,
+      3
     ],
     [
-      4,
-      60
+      3,
+      61
     ]
   ],
-  "threshold": 0.4799999999999998,
+  "threshold": 0.40999999999999986,
   "test_rows": 516,
-  "threshold_tuning": "Spam F1 maximization on validation split only."
+  "threshold_tuning": "F2 maximization on validation split only; test set not used for selection."
 }
